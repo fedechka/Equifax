@@ -3,6 +3,8 @@
 $params = require __DIR__ . '/params.php';
 $db = require __DIR__ . '/db.php';
 
+use kartik\datecontrol\Module;
+
 $config = [
     'id' => 'basic',
     'basePath' => dirname(__DIR__),
@@ -43,19 +45,27 @@ $config = [
             ],
         ],
         'db' => $db,
-
-        'urlManager' => [
-            'enablePrettyUrl' => true,
-            'showScriptName' => false,
-            'rules' => [
-                '/' => 'site/index',
-                'about' => 'site/about',
-                'contact' => 'site/contact',
-            ],
-	    'enableStrictParsing' => true,
+    ],
+        'modules' => [
+        'datecontrol' => [
+        'class' => 'kartik\DateControl\Module',
+	    'displaySettings' => [
+	        Module::FORMAT_DATE => 'php:d/m/Y',
+	        Module::FORMAT_TIME => 'H:i:s A',
+	        Module::FORMAT_DATETIME => 'php:d/m/Y H:i',
+	    ],
+	    'saveSettings' => [
+	        Module::FORMAT_DATE => 'php:Y-m-d', // saves as unix timestamp U
+	        Module::FORMAT_TIME => 'H:i:s',
+	        Module::FORMAT_DATETIME => 'php:Y-m-d H:i:s',
+	    ],
+        'autoWidget' => true,
+       ], 
+        'formatter' =>[
+            'dateFormat' => 'php: d/m/Y',
+            'datetimeFormat' => 'php: d/m/Y H:i'
         ],
     ],
-    'params' => $params,
 ];
 
 if (YII_ENV_DEV) {
@@ -64,7 +74,7 @@ if (YII_ENV_DEV) {
     $config['modules']['debug'] = [
         'class' => 'yii\debug\Module',
         // uncomment the following to add your IP if you are not connecting from localhost.
-        //'allowedIPs' => ['127.0.0.1', '::1'],
+        'allowedIPs' => ['*'],
     ];
 
     $config['bootstrap'][] = 'gii';

@@ -4,6 +4,10 @@ namespace app\models;
 
 use Yii;
 
+use yii\behaviors\TimestampBehavior;
+use yii\db\ActiveRecord;
+use yii\db\Expression;
+
 /**
  * This is the model class for table "books".
  *
@@ -18,6 +22,8 @@ use Yii;
  */
 class Books extends \yii\db\ActiveRecord
 {
+    public $author;
+    
     /**
      * {@inheritdoc}
      */
@@ -32,11 +38,12 @@ class Books extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['name', 'author_id'], 'required'],
-            [['date_manuf', 'author_id'], 'integer'],
-            [['date_create', 'date_change'], 'safe'],
-            [['name'], 'string', 'max' => 255],
+            [['name', 'date_manuf', 'author_id'], 'required'],
+            [['author_id'], 'integer'],
+            [['author', 'date_manuf', 'date_create', 'date_change'], 'safe'],
+            [['author', 'name'], 'string', 'max' => 255],
             [['author_id'], 'exist', 'skipOnError' => true, 'targetClass' => Authors::className(), 'targetAttribute' => ['author_id' => 'id']],
+            [['author'], 'exist', 'skipOnError' => true, 'targetClass' => Authors::className(), 'targetAttribute' => ['name' => 'author']],
         ];
     }
 
@@ -49,7 +56,7 @@ class Books extends \yii\db\ActiveRecord
             'id' => 'ID',
             'name' => 'Name',
             'date_manuf' => 'Date Manuf',
-            'author_id' => 'Author ID',
+            'author' => 'Author',
             'date_create' => 'Date Create',
             'date_change' => 'Date Change',
         ];
@@ -62,8 +69,23 @@ class Books extends \yii\db\ActiveRecord
      */
     public function getAuthor()
     {
-        return $this->hasOne(Authors::className(), ['id' => 'author_id']);
+        return $this->hasOne(Authors::className(), ['author_id' => 'id']);
     }
+
+    
+    public function behaviors(){
+        return [
+            [
+                'class' => TimestampBehavior::className(),
+                'attributes' => [
+                    ActiveRecord::EVENT_BEFORE_INSERT => ['date_create', 'date_change'],
+                    ActiveRecord::EVENT_BEFORE_UPDATE => ['date_change'],
+                ],
+                'value' => new Expression('NOW()'),
+            ],
+        ];
+    }
+
 
     /**
      * {@inheritdoc}

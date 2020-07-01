@@ -4,7 +4,6 @@ namespace app\models;
 
 use Yii;
 
-use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 use yii\db\Expression;
 
@@ -20,11 +19,8 @@ use yii\db\Expression;
  *
  * @property Books[] $books
  */
-class Authors extends \yii\db\ActiveRecord
+class Index extends \yii\db\ActiveRecord
 {
-    
-    public $books_count;
-    
     /**
      * {@inheritdoc}
      */
@@ -71,28 +67,12 @@ class Authors extends \yii\db\ActiveRecord
         return $this->hasMany(Books::className(), ['author_id' => 'id']);
     }
 
-    
-    
-    public function behaviors(){
-        return [
-            [
-                'class' => TimestampBehavior::className(),
-                'attributes' => [
-                    ActiveRecord::EVENT_BEFORE_INSERT => ['date_create', 'date_change'],
-                    ActiveRecord::EVENT_BEFORE_UPDATE => ['date_change'],
-                ],
-                'value' => new Expression('NOW()'),
-            ],
-        ];
-    }
-
-
     /**
      * {@inheritdoc}
-     * @return AuthorsQuery the active query used by this AR class.
+     * @return IndexQuery the active query used by this AR class.
      */
     public static function find()
     {
-        return new AuthorsQuery(get_called_class());
+        return new IndexQuery(get_called_class());
     }
 }
